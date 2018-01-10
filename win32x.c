@@ -1,16 +1,22 @@
 #include <windows.h>
-LPCSTR AppName = "TesT";
-#define IDT_TIMER1 901
-#define SETTING_INTERVAL_FLASH 200
+#include "win32x.h"
+
+
 
 char text_buffer[16384];
 int text_buffer_length = -1;
 int cursor_loc = 10;
 int cursor_state = 0;
+int g_cursor_top = 0;
+int g_cursor_bottom = 0;
+
 LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 {
   HMENU hM, hSM, hWndList;
   POINT cursor;
+  HDC memDC;
+  HBITMAP memBM;
+  RECT rec;
   switch(message)
   {
     case WM_TIMER:
@@ -40,6 +46,10 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
         "screen every time the cursor blinks.\n"
         );
       SetTimer( hWnd, IDT_TIMER1, SETTING_INTERVAL_FLASH, (TIMERPROC) NULL );
+      memDC = CreateCompatibleDC( GetDC( hWnd ) );
+      GetClientRect( hWnd, &rec );
+      memBM = CreateCompatibleBitmap( GetDC( hWnd ), rec.right, rec.bottom );
+      SelectObject( memDC, memBM );
       /*
       CreateWindowEx(0, "STATIC", "A Static Label", WS_CHILD | WS_VISIBLE, 10, 10, 96, 20, hWnd, (HMENU)2, NULL, NULL);
       CreateWindowEx(0, "BUTTON", "A Button", WS_CHILD | WS_VISIBLE, 10, 40, 72, 20, hWnd, (HMENU)33, NULL, NULL);
@@ -209,11 +219,11 @@ int WINAPI WinMain(HINSTANCE hInst, HINSTANCE hPrevInst, LPSTR lpCmdLine, int nC
   wc1.lpszClassName = AppName;
   wc1.lpfnWndProc = (WNDPROC)WndProc;
   wc1.style = CS_DBLCLKS | CS_VREDRAW | CS_HREDRAW;
-  wc1.hbrBackground = GetSysColorBrush(COLOR_WINDOW);
+  wc1.hbrBackground = CreateSolidBrush(RGB(255,255,255));//GetSysColorBrush(COLOR_WINDOW);
   wc1.hIcon = LoadIcon(NULL, IDI_INFORMATION);
   wc1.hCursor = LoadCursor(NULL, IDC_ARROW);
   if(RegisterClass(&wc1) == FALSE) return 0;
-  hWnd1 = CreateWindow(AppName, AppName, WS_OVERLAPPEDWINDOW | WS_VISIBLE, 10, 10, 360, 240, 0, 0, hInst, 0);
+  hWnd1 = CreateWindow(AppName, AppName, WS_VISIBLE | WS_CLIPSIBLINGS | WS_BORDER | WS_DLGFRAME | WS_SYSMENU | WS_GROUP, 10, 10, 360, 240, 0, 0, hInst, 0);
   if(hWnd1 == NULL) return 0;
   while(GetMessage(&msg1,NULL,0,0) > 0){
     TranslateMessage(&msg1);

@@ -31,9 +31,10 @@ NULL=nul
 !ENDIF 
 ################################################################################
 # Begin Project
+# PROP Target_Last_Scanned "texttest - Win32 Debug"
+MTL=mktyplib.exe
 CPP=cl.exe
 RSC=rc.exe
-MTL=mktyplib.exe
 
 !IF  "$(CFG)" == "texttest - Win32 Release"
 
@@ -108,12 +109,12 @@ INTDIR=.\Debug
 ALL : "$(OUTDIR)\texttest.exe"
 
 CLEAN : 
+	-@erase ".\Debug\vc40.pdb"
+	-@erase ".\Debug\vc40.idb"
 	-@erase ".\Debug\texttest.exe"
 	-@erase ".\Debug\win32x.obj"
 	-@erase ".\Debug\texttest.ilk"
 	-@erase ".\Debug\texttest.pdb"
-	-@erase ".\Debug\vc40.pdb"
-	-@erase ".\Debug\vc40.idb"
 
 "$(OUTDIR)" :
     if not exist "$(OUTDIR)/$(NULL)" mkdir "$(OUTDIR)"
@@ -186,8 +187,11 @@ LINK32_OBJS= \
 # Begin Source File
 
 SOURCE=.\win32x.c
+DEP_CPP_WIN32=\
+	".\win32x.h"\
+	
 
-"$(INTDIR)\win32x.obj" : $(SOURCE) "$(INTDIR)"
+"$(INTDIR)\win32x.obj" : $(SOURCE) $(DEP_CPP_WIN32) "$(INTDIR)"
 
 
 # End Source File
